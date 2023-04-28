@@ -1,0 +1,140 @@
+CREATE TABLE Departments (
+   dept_no VARCHAR(4) PRIMARY KEY, 
+   dept_name VARCHAR
+);
+
+CREATE TABLE Titles (
+   title_id VARCHAR(5) PRIMARY KEY,
+   title VARCHAR
+);
+
+CREATE TABLE Salaries (
+   emp_no INTEGER PRIMARY KEY,
+   salary INTEGER
+);
+
+CREATE TABLE Dept_Manager (
+   emp_no INTEGER PRIMARY KEY,
+   dept_no VARCHAR(4)
+);
+
+CREATE TABLE Employees (
+   emp_no INTEGER PRIMARY KEY,
+   emp_title VARCHAR(5),
+   birth_date DATE,
+   first_name VARCHAR,
+   last_name VARCHAR,
+   sex CHAR(1) CHECK (sex IN ('M', 'F')),
+   hire_date DATE,
+   FOREIGN KEY (emp_title) REFERENCES Titles (title_id)
+);
+
+
+CREATE TABLE Dept_emp (
+  emp_no INT NOT NULL,
+  dept_no VARCHAR(4) NOT NULL,
+  PRIMARY KEY (emp_no, dept_no),
+  FOREIGN KEY (emp_no) REFERENCES Employees (emp_no),
+  FOREIGN KEY (dept_no) REFERENCES Departments (dept_no)
+);
+
+
+COPY Departments(dept_no, dept_name)
+FROM 'departments.csv'
+DELIMITER ','
+CSV HEADER;
+
+COPY Titles(title_id, title)
+FROM 'titles.csv'
+DELIMITER ','
+CSV HEADER;
+
+COPY Salaries(emp_no, salary)
+FROM 'salaries.csv'
+DELIMITER ','
+CSV HEADER;
+
+COPY Dept_Manager(dept_no, emp_no)
+FROM 'dept_manager.csv'
+DELIMITER ','
+CSV HEADER;
+
+
+
+-- Import the CSV file into a temporary table
+CREATE TEMPORARY TABLE temp_employees (
+  emp_no INTEGER,
+  emp_title_id VARCHAR(10),
+  birth_date VARCHAR(10),
+  first_name VARCHAR(50),
+  last_name VARCHAR(50),
+  sex VARCHAR(1),
+  hire_date VARCHAR(10)
+);
+
+COPY temp_employees FROM 'employees.csv' DELIMITER ',' CSV HEADER;
+
+-- Convert the birth_date and hire_date columns to DATE type and update the table
+UPDATE temp_employees
+SET birth_date = TO_DATE(birth_date, 'MM/DD/YYYY'),
+    hire_date = TO_DATE(hire_date, 'MM/DD/YYYY');
+
+-- Insert the data from the temporary table into the Employees table
+INSERT INTO Employees (emp_no, emp_title, birth_date, first_name, last_name, sex, hire_date)
+SELECT emp_no, emp_title_id, birth_date::DATE, first_name, last_name, sex, hire_date::DATE
+FROM temp_employees;
+
+-- Clean up the temporary table
+DROP TABLE temp_employees;
+
+
+COPY Dept_Emp(emp_no,dept_no )
+FROM 'dept_emp.csv'
+DELIMITER ','
+CSV HEADER;
+
+
+
+
+/*drop table dept_emp;
+drop table employees;
+drop table dept_manager;
+drop table salaries;
+drop table titles;
+drop table departments;   
+*/
+
+Titles
+-
+title_id VARCHAR PK
+title VARCHAR
+
+Departments
+-
+dept_no VARCHAR PK
+dept_name VARCHAR
+
+Salaries
+-
+emp_no INTEGER PK
+salary INTEGER
+
+Dept_Manager
+-
+emp_no INTEGER PK
+dept_no VARCHAR
+
+Employees
+-
+emp_no INTEGER PK
+emp_title VARCHAR FK >- Titles.title_id
+birth_date DATE
+first_name VARCHAR
+last_name VARCHAR
+sex CHAR
+hire_date DATE
+
+Dept_Emp
+-
+emp_no INTEGER PK FK >- Employees.emp_no
+dept_no VARCHAR PK FK >- Departments.dept_no
