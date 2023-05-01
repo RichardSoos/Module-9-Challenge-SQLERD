@@ -1,26 +1,26 @@
 CREATE TABLE Departments (
    dept_no VARCHAR(4) PRIMARY KEY, 
-   dept_name VARCHAR
+   dept_name VARCHAR NOT NULL
 );
 
 CREATE TABLE Titles (
    title_id VARCHAR(5) PRIMARY KEY,
-   title VARCHAR
+   title VARCHAR NOT NULL
 );
 
 CREATE TABLE Salaries (
    emp_no INTEGER PRIMARY KEY,
-   salary INTEGER
+   salary INTEGER NOT NULL
 );
 
 CREATE TABLE Dept_Manager (
    emp_no INTEGER PRIMARY KEY,
-   dept_no VARCHAR(4)
+   dept_no VARCHAR(4) NOT NULL
 );
 
 CREATE TABLE Employees (
    emp_no INTEGER PRIMARY KEY,
-   emp_title VARCHAR(5),
+   emp_title VARCHAR(5) NOT NULL,
    birth_date DATE,
    first_name VARCHAR,
    last_name VARCHAR,
